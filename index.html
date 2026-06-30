@@ -96,8 +96,8 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
       </div>
       <label for="importFile" class="btn px-3 py-2 text-xs sm:text-sm border cursor-pointer" style="border-color:var(--clr-border)" title="Import CSV/TXT/Excel">⬆ <span class="hidden sm:inline">Import</span></label>
       <input type="file" id="importFile" accept=".csv,.txt,.xlsx,.xls" class="hidden">
-      <a href="https://superlinknetworks.com" target="_blank" rel="noopener" class="btn px-3 py-2 text-xs sm:text-sm border hidden sm:inline-flex items-center gap-1" style="border-color:var(--clr-border)">
-      Superlinknetworks
+      <a href="https://Superlinknetworks" target="_blank" rel="noopener" class="btn px-3 py-2 text-xs sm:text-sm border hidden sm:inline-flex items-center gap-1" style="border-color:var(--clr-border)">
+        Superlink Networks
       </a>
       <button id="themeToggle" class="btn p-2 border" style="border-color:var(--clr-border)" aria-label="Toggle dark mode">
         <svg id="iconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.02 0l-.7.7M6.34 17.66l-.7.7M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
@@ -283,7 +283,7 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
 
   <!-- Live Preview -->
   <div class="card p-5 sm:p-6">
-    <h2 class="font-bold text-lg mb-4 flex items-center gap-2">Live Preview</h2>
+    <h2 class="font-bold text-lg mb-4 flex items-center gap-2">👁️ Live Preview</h2>
     <div id="previewBox" class="space-y-2 text-sm font-mono">
       <div class="skel h-5 w-3/4"></div>
       <div class="skel h-5 w-2/3"></div>
@@ -292,6 +292,40 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
     <div class="mt-4 pt-4 border-t text-xs" style="border-color:var(--clr-border); color:var(--clr-muted)">
       Preview menampilkan 3 baris pertama secara realtime saat anda mengubah konfigurasi.
     </div>
+  </div>
+</section>
+
+<!-- ============ IP ADDRESS & HOST ANALYSIS ============ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 mb-10">
+  <div class="card p-5 sm:p-6">
+    <h2 class="font-bold text-lg mb-1 flex items-center gap-2">IP Address &amp; Host Analysis</h2>
+    <p class="text-sm mb-4" style="color:var(--clr-muted)">Masukkan Network/CIDR, sistem otomatis menghitung subnet mask, broadcast, jumlah host, serta meng-assign IP ke setiap username/host secara berurutan.</p>
+    <div class="grid sm:grid-cols-3 gap-4 mb-4">
+      <div class="sm:col-span-2">
+        <label class="label">IP Network / CIDR</label>
+        <input id="fIpCidr" class="input" placeholder="contoh: 192.168.1.0/24" value="">
+      </div>
+      <div>
+        <label class="label">Mulai dari IP ke-</label>
+        <input id="fIpOffset" type="number" class="input" value="1" min="0">
+      </div>
+    </div>
+    <label class="flex items-center gap-2 mb-4 cursor-pointer">
+      <input type="checkbox" id="fAssignIp" class="checkbox">
+      <span class="font-semibold text-sm">Assign IP otomatis ke setiap baris hasil generate (Local Address)</span>
+    </label>
+    <p id="ipError" class="text-sm mb-3 hidden" style="color:#ef4444"></p>
+    <div id="ipAnalysis" class="grid grid-cols-2 sm:grid-cols-4 gap-3 hidden">
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Network Address</div><div id="ipNetwork" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Broadcast</div><div id="ipBroadcast" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Subnet Mask</div><div id="ipMask" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Wildcard Mask</div><div id="ipWildcard" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Total Host (/n)</div><div id="ipTotalHost" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">Usable Host</div><div id="ipUsableHost" class="font-mono font-bold text-sm" style="color:var(--clr-success)">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">IP Pertama Usable</div><div id="ipFirst" class="font-mono font-bold text-sm">-</div></div>
+      <div class="p-3 rounded-xl border" style="border-color:var(--clr-border)"><div class="label">IP Terakhir Usable</div><div id="ipLast" class="font-mono font-bold text-sm">-</div></div>
+    </div>
+    <div id="ipHostStatus" class="mt-3 text-sm hidden"></div>
   </div>
 </section>
 
@@ -319,10 +353,10 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
     <div class="flex flex-wrap items-center gap-2 mb-3 text-sm">
       <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="selectAll" class="checkbox"> Pilih Semua</label>
       <button id="deleteSelected" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border); color:#ef4444">🗑 Hapus Terpilih</button>
-      <button id="copySelected" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Terpilih</button>
-      <button id="copyUserCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Kolom Username</button>
-      <button id="copyPassCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Kolom Password</button>
-      <button id="copyAll" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Semua</button>
+      <button id="copySelected" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">📋 Copy Terpilih</button>
+      <button id="copyUserCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">📋 Copy Kolom Username</button>
+      <button id="copyPassCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">📋 Copy Kolom Password</button>
+      <button id="copyAll" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">📋 Copy Semua</button>
       <span id="selCount" class="text-xs ml-auto" style="color:var(--clr-muted)"></span>
     </div>
 
@@ -335,6 +369,7 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
             <th class="p-3 text-left cursor-pointer sort-col" data-key="username">Username ↕</th>
             <th class="p-3 text-left cursor-pointer sort-col" data-key="password">Password ↕</th>
             <th class="p-3 text-left cursor-pointer sort-col" data-key="host">Host ↕</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="ip">IP Address ↕</th>
             <th class="p-3 text-left cursor-pointer sort-col" data-key="profile">Profile ↕</th>
             <th class="p-3 text-left">Comment</th>
             <th class="p-3 text-left cursor-pointer sort-col" data-key="status">Status ↕</th>
@@ -342,8 +377,8 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)">
-            <div class="text-4xl mb-2"></div>
+          <tr><td colspan="10" class="p-10 text-center" style="color:var(--clr-muted)">
+            <div class="text-4xl mb-2">📭</div>
             Belum ada data. Klik <b>Generate Username</b> untuk mulai.
           </td></tr>
         </tbody>
@@ -375,10 +410,10 @@ table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-inde
     </div>
     <div>
       <div class="font-semibold mb-2">About</div>
-      <p class="opacity-60">Dibuat dengan HTML5, Tailwind CSS, dan Vanilla JavaScript ES6+. Tanpa framework, tanpa jQuery. Open source &amp; gratis.</p>
+      <p class="opacity-60"></p>
     </div>
   </div>
-  <div class="text-center opacity-40 text-xs pb-6">© 2026 SuperGenerate. All rights reserved.</div>
+  <div class="text-center opacity-40 text-xs pb-6">© 2026 SuperGenerate by <a href="https://superlinknetworks.com">Superlink Networks</a></div>
 </footer>
 
 <!-- Toast container -->
@@ -466,8 +501,51 @@ const Theme = (()=>{
 })();
 
 /* =========================================================
-   GENERATOR MODULE
+   IP ADDRESS CALCULATOR MODULE
 ========================================================= */
+const IPCalc = (()=>{
+  function ipToInt(ip){
+    const p = ip.split('.').map(Number);
+    if(p.length!==4 || p.some(n=> isNaN(n) || n<0 || n>255)) return null;
+    return ((p[0]<<24) | (p[1]<<16) | (p[2]<<8) | p[3]) >>> 0;
+  }
+  function intToIp(int){
+    return [(int>>>24)&255,(int>>>16)&255,(int>>>8)&255,int&255].join('.');
+  }
+  function parseCidr(str){
+    const m = String(str||'').trim().match(/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/);
+    if(!m) return null;
+    const ip = m[1], prefix = parseInt(m[2]);
+    if(prefix<0 || prefix>32) return null;
+    const ipInt = ipToInt(ip);
+    if(ipInt===null) return null;
+    return {ip, ipInt, prefix};
+  }
+  function analyze(cidrStr){
+    const parsed = parseCidr(cidrStr);
+    if(!parsed) return null;
+    const {ipInt, prefix} = parsed;
+    const maskInt = prefix===0 ? 0 : (0xFFFFFFFF << (32-prefix)) >>> 0;
+    const wildcardInt = (~maskInt) >>> 0;
+    const networkInt = (ipInt & maskInt) >>> 0;
+    const broadcastInt = (networkInt | wildcardInt) >>> 0;
+    const totalHost = Math.pow(2, 32-prefix);
+    const usableHost = prefix>=31 ? 0 : totalHost-2;
+    const firstUsableInt = prefix>=31 ? networkInt : networkInt+1;
+    const lastUsableInt = prefix>=31 ? broadcastInt : broadcastInt-1;
+    return {
+      network: intToIp(networkInt), broadcast: intToIp(broadcastInt),
+      mask: intToIp(maskInt), wildcard: intToIp(wildcardInt),
+      totalHost, usableHost,
+      firstUsable: intToIp(firstUsableInt), lastUsable: intToIp(lastUsableInt),
+      firstUsableInt, lastUsableInt, prefix
+    };
+  }
+  function ipAt(firstUsableInt, offset){ return intToIp(firstUsableInt+offset); }
+  return {analyze, ipAt, intToIp, ipToInt};
+})();
+
+
 const Generator = (()=>{
   const SYMS = '!@#$%^&*';
   const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
@@ -607,6 +685,10 @@ function liveUpdateStats(){
   const opts = getFormOptions();
   const total = Math.max(0, Math.abs(opts.end - opts.start)+1);
   $('#statDigit').textContent = `${opts.digit} / ${opts.prefix || '-'}`;
+  const ipRes = renderIpAnalysis();
+  checkIpVsUserCount(ipRes);
+  const assignIp = $('#fAssignIp').checked && ipRes;
+  const ipOffset = parseInt($('#fIpOffset').value)||0;
   // preview
   const previewBox = $('#previewBox');
   if(!opts.prefix){ return; }
@@ -615,14 +697,55 @@ function liveUpdateStats(){
     const n = opts.start + i;
     const u = Generator.buildUsername(opts, n);
     const p = Generator.buildPassword(opts, u);
-    sample.push(`<div class="fade-in flex justify-between gap-2 p-2 rounded-lg" style="background:var(--clr-bg);border:1px solid var(--clr-border)"><span class="font-semibold">${escapeHTML(u)}</span><span style="color:var(--clr-muted)">${escapeHTML(p)}</span></div>`);
+    const ip = assignIp ? IPCalc.intToIp(ipRes.firstUsableInt + ipOffset + i) : '';
+    sample.push(`<div class="fade-in flex justify-between gap-2 p-2 rounded-lg" style="background:var(--clr-bg);border:1px solid var(--clr-border)"><span class="font-semibold">${escapeHTML(u)}</span><span style="color:var(--clr-muted)">${escapeHTML(p)}</span>${ip?`<span style="color:var(--clr-primary)" class="font-mono">${escapeHTML(ip)}</span>`:''}</div>`);
   }
   previewBox.innerHTML = sample.join('') || '<span style="color:var(--clr-muted)">Tidak ada preview</span>';
 }
 
-/* =========================================================
-   TABLE RENDER MODULE
-========================================================= */
+function renderIpAnalysis(){
+  const cidrStr = $('#fIpCidr').value.trim();
+  const errEl = $('#ipError');
+  const box = $('#ipAnalysis');
+  if(!cidrStr){ errEl.classList.add('hidden'); box.classList.add('hidden'); return null; }
+  const res = IPCalc.analyze(cidrStr);
+  if(!res){
+    errEl.textContent = 'Format IP/CIDR tidak valid. Contoh yang benar: 192.168.1.0/24';
+    errEl.classList.remove('hidden');
+    box.classList.add('hidden');
+    return null;
+  }
+  errEl.classList.add('hidden');
+  box.classList.remove('hidden');
+  $('#ipNetwork').textContent = `${res.network}/${res.prefix}`;
+  $('#ipBroadcast').textContent = res.broadcast;
+  $('#ipMask').textContent = res.mask;
+  $('#ipWildcard').textContent = res.wildcard;
+  $('#ipTotalHost').textContent = res.totalHost.toLocaleString('id-ID');
+  $('#ipUsableHost').textContent = res.usableHost.toLocaleString('id-ID');
+  $('#ipFirst').textContent = res.firstUsable;
+  $('#ipLast').textContent = res.lastUsable;
+  return res;
+}
+
+function checkIpVsUserCount(ipRes){
+  const statusEl = $('#ipHostStatus');
+  if(!ipRes){ statusEl.classList.add('hidden'); return; }
+  const opts = getFormOptions();
+  const totalUser = Math.max(0, Math.abs(opts.end-opts.start)+1);
+  const offset = parseInt($('#fIpOffset').value)||0;
+  const available = ipRes.usableHost - offset;
+  statusEl.classList.remove('hidden');
+  if(available < totalUser){
+    statusEl.innerHTML = `⚠️ <b>Tidak cukup!</b> Subnet ini hanya menyisakan <b>${Math.max(0,available)}</b> IP usable setelah offset, sedangkan jumlah user yang akan digenerate <b>${totalUser}</b>. Tambah ukuran subnet atau kurangi jumlah user.`;
+    statusEl.style.color = '#ef4444';
+  } else {
+    statusEl.innerHTML = `✅ Subnet cukup untuk <b>${totalUser}</b> user. Sisa IP usable setelah alokasi: <b>${available-totalUser}</b>.`;
+    statusEl.style.color = 'var(--clr-success)';
+  }
+}
+
+
 function applyFilters(){
   const s = State.search.toLowerCase();
   State.filtered = State.data.filter(row=>{
@@ -647,9 +770,9 @@ function renderTable(){
   const pageRows = State.filtered.slice(startIdx, startIdx+State.pageSize);
 
   if(State.data.length === 0){
-    tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)"><div class="text-4xl mb-2">📭</div>Belum ada data. Klik <b>Generate Username</b> untuk mulai.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center" style="color:var(--clr-muted)"><div class="text-4xl mb-2">📭</div>Belum ada data. Klik <b>Generate Username</b> untuk mulai.</td></tr>`;
   } else if(pageRows.length === 0){
-    tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)">🔍 Tidak ada data yang cocok dengan pencarian.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center" style="color:var(--clr-muted)">🔍 Tidak ada data yang cocok dengan pencarian.</td></tr>`;
   } else {
     tbody.innerHTML = pageRows.map(row=>{
       const statusColor = row.status==='active' ? 'var(--clr-success)' : '#ef4444';
@@ -659,6 +782,7 @@ function renderTable(){
         <td class="p-3 font-mono font-semibold">${escapeHTML(row.username)}</td>
         <td class="p-3 font-mono">${escapeHTML(row.password)}</td>
         <td class="p-3 font-mono">${escapeHTML(row.host)}</td>
+        <td class="p-3 font-mono" style="color:var(--clr-primary)">${escapeHTML(row.ip||'-')}</td>
         <td class="p-3">${escapeHTML(row.profile)}</td>
         <td class="p-3">${escapeHTML(row.comment)}</td>
         <td class="p-3"><span class="badge" style="background:color-mix(in srgb, ${statusColor} 15%, transparent); color:${statusColor}">${row.status}</span></td>
@@ -712,9 +836,9 @@ function updateSelCount(){
 ========================================================= */
 const ExportModule = (()=>{
   function rowsToCSVText(rows){
-    const headers = ['No','Username','Password','Host','Profile','Comment','Status'];
+    const headers = ['No','Username','Password','Host','IP Address','Profile','Comment','Status'];
     const lines = [headers.join(',')];
-    rows.forEach(r=> lines.push([r.no,r.username,r.password,r.host,r.profile,`"${r.comment.replace(/"/g,'""')}"`,r.status].join(',')));
+    rows.forEach(r=> lines.push([r.no,r.username,r.password,r.host,r.ip||'',r.profile,`"${r.comment.replace(/"/g,'""')}"`,r.status].join(',')));
     return lines.join('\n');
   }
   function download(filename, content, mime='text/plain'){
@@ -727,12 +851,12 @@ const ExportModule = (()=>{
   }
   function toCSV(rows){ download('username.csv', rowsToCSVText(rows), 'text/csv'); }
   function toTXT(rows){
-    const text = rows.map(r=>`${r.username}:${r.password}`).join('\n');
+    const text = rows.map(r=>`${r.username}:${r.password}${r.ip? ' | IP: '+r.ip : ''}`).join('\n');
     download('username.txt', text, 'text/plain');
   }
   function toJSON(rows){ download('username.json', JSON.stringify(rows,null,2), 'application/json'); }
   function toXLSX(rows){
-    const ws = XLSX.utils.json_to_sheet(rows.map(r=>({No:r.no,Username:r.username,Password:r.password,Host:r.host,Profile:r.profile,Comment:r.comment,Status:r.status})));
+    const ws = XLSX.utils.json_to_sheet(rows.map(r=>({No:r.no,Username:r.username,Password:r.password,Host:r.host,'IP Address':r.ip||'',Profile:r.profile,Comment:r.comment,Status:r.status})));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,ws,'Username');
     XLSX.writeFile(wb,'username.xlsx');
@@ -743,15 +867,15 @@ const ExportModule = (()=>{
     doc.setFontSize(14); doc.text('SuperGenerate - Username Export', 14, 15);
     doc.autoTable({
       startY: 22,
-      head: [['No','Username','Password','Host','Profile','Status']],
-      body: rows.map(r=>[r.no,r.username,r.password,r.host,r.profile,r.status]),
+      head: [['No','Username','Password','Host','IP Address','Profile','Status']],
+      body: rows.map(r=>[r.no,r.username,r.password,r.host,r.ip||'',r.profile,r.status]),
       styles:{fontSize:8}
     });
     doc.save('username.pdf');
   }
   function toMikrotik(rows){
     const lines = rows.map(r=>{
-      return `/ppp secret add \\\n  name=${r.username} \\\n  password=${r.password} \\\n  service=pppoe \\\n  profile=${r.profile} \\\n  comment="${r.comment||''}"${r.status==='disabled'?' \\\n  disabled=yes':''}`;
+      return `/ppp secret add \\\n  name=${r.username} \\\n  password=${r.password} \\\n  service=pppoe \\\n  profile=${r.profile} \\${r.ip? `\n  remote-address=${r.ip} \\` : ''}\n  comment="${r.comment||''}"${r.status==='disabled'?' \\\n  disabled=yes':''}`;
     });
     download('mikrotik_secrets.rsc', lines.join('\n\n'), 'text/plain');
   }
@@ -827,6 +951,11 @@ function bindFormLiveUpdate(){
     $('#hostOptions').classList.toggle('opacity-50', !$('#fGenHost').checked);
     $('#hostOptions').classList.toggle('pointer-events-none', !$('#fGenHost').checked);
   });
+
+  ['fIpCidr','fIpOffset','fAssignIp'].forEach(id=>{
+    $('#'+id).addEventListener('input', ()=>{ const res = renderIpAnalysis(); checkIpVsUserCount(res); });
+    $('#'+id).addEventListener('change', ()=>{ const res = renderIpAnalysis(); checkIpVsUserCount(res); });
+  });
 }
 
 function handleGenerate(){
@@ -849,7 +978,19 @@ function handleGenerate(){
     if(opts.genHost){
       opts.hostList = Generator.generateHosts(opts.hostPrefix, opts.hostCount);
     }
+    const ipRes = renderIpAnalysis();
+    const assignIp = $('#fAssignIp').checked && ipRes;
+    const ipOffset = parseInt($('#fIpOffset').value)||0;
     const result = Generator.generate(opts);
+    if(assignIp){
+      result.forEach((row,i)=>{
+        const ipInt = ipRes.firstUsableInt + ipOffset + i;
+        row.ip = ipInt <= ipRes.lastUsableInt ? IPCalc.intToIp(ipInt) : '';
+      });
+    } else {
+      result.forEach(row=> row.ip = '');
+    }
+    checkIpVsUserCount(ipRes);
     // duplicate check
     const seen = new Set();
     let dupCount = 0;
