@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperGenerate — PPPoE User Generator</title>
+<meta name="description" content="Generate ribuan username PPPoE secara otomatis dalam hitungan detik. Tool gratis untuk ISP dan Network Engineer.">
+<meta property="og:title" content="SuperGenerate — Modern PPPoE Username Generator">
+<meta property="og:description" content="Generate ribuan username PPPoE secara otomatis dalam hitungan detik.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2335558A'/%3E%3Ctext x='50' y='68' font-size='55' fill='%23fff' text-anchor='middle' font-family='Arial' font-weight='bold'%3ES%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --clr-primary:#35558A; --clr-primary-lt:#4a73b5;
+  --clr-accent:#FF5F01; --clr-accent-lt:#ff7a2e;
+  --clr-footer:#0B1325;
+  --clr-bg:#ffffff; --clr-surface:#f8fafd; --clr-border:#e8edf5;
+  --clr-text:#1a2540; --clr-muted:#6b7a99;
+  --clr-info:#0ea5e9; --clr-success:#10b981; --clr-warning:#f59e0b;
+}
+html.dark{
+  --clr-bg:#0d1426; --clr-surface:#121b33; --clr-border:#22304f;
+  --clr-text:#eef2fb; --clr-muted:#8c9bc0;
+}
+*{transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease,transform .2s ease;}
+body{background:var(--clr-bg);color:var(--clr-text);font-family:'Inter',system-ui,-apple-system,sans-serif;}
+.glass{backdrop-filter:blur(14px) saturate(160%);background:color-mix(in srgb, var(--clr-surface) 78%, transparent);}
+.card{background:var(--clr-surface);border:1px solid var(--clr-border);border-radius:1.25rem;box-shadow:0 1px 2px rgba(20,30,60,.04),0 8px 24px -8px rgba(20,30,60,.08);}
+.card:hover{box-shadow:0 4px 10px rgba(20,30,60,.06),0 16px 32px -10px rgba(20,30,60,.14);}
+.btn{border-radius:.9rem;font-weight:600;transition:all .3s ease;position:relative;overflow:hidden;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:linear-gradient(135deg,var(--clr-primary),var(--clr-primary-lt));color:#fff;}
+.btn-primary:hover{box-shadow:0 8px 20px -6px rgba(53,85,138,.55);}
+.btn-accent{background:linear-gradient(135deg,var(--clr-accent),var(--clr-accent-lt));color:#fff;}
+.btn-accent:hover{box-shadow:0 8px 20px -6px rgba(255,95,1,.55);}
+.input{background:var(--clr-bg);border:1px solid var(--clr-border);border-radius:.85rem;color:var(--clr-text);padding:.55rem .85rem;width:100%;font-size:.875rem;}
+.input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px color-mix(in srgb, var(--clr-primary) 18%, transparent);}
+.label{font-size:.72rem;font-weight:600;color:var(--clr-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;display:block;}
+.badge{font-size:.68rem;font-weight:700;padding:.15rem .55rem;border-radius:9999px;}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple .6s linear;pointer-events:none;}
+@keyframes ripple{to{transform:scale(4);opacity:0;}}
+.skel{background:linear-gradient(90deg,var(--clr-border) 25%,color-mix(in srgb,var(--clr-border) 60%, white) 50%,var(--clr-border) 75%);background-size:200% 100%;animation:skel 1.4s infinite;border-radius:.6rem;}
+@keyframes skel{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.fade-in{animation:fadeIn .4s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.scale-pop{animation:scalePop .3s ease both;}
+@keyframes scalePop{0%{transform:scale(.9);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.counter{font-variant-numeric:tabular-nums;}
+.toast{animation:slideIn .3s ease both;}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+table.modern thead th{position:sticky;top:0;background:var(--clr-surface);z-index:10;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--clr-border);border-radius:8px;}
+.checkbox{width:1.05rem;height:1.05rem;accent-color:var(--clr-primary);cursor:pointer;}
+.copy-flash{animation:flash .5s ease;}
+@keyframes flash{0%{background-color:color-mix(in srgb, var(--clr-success) 30%, transparent);}100%{background-color:transparent;}}
+.spinner{border:3px solid var(--clr-border);border-top-color:var(--clr-primary);border-radius:50%;width:1.1rem;height:1.1rem;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.tooltip{position:relative;}
+.tooltip:hover::after{content:attr(data-tip);position:absolute;bottom:120%;left:50%;transform:translateX(-50%);background:var(--clr-footer);color:#fff;font-size:.68rem;padding:.3rem .55rem;border-radius:.4rem;white-space:nowrap;z-index:50;}
+.sr-only-focus:focus{position:static;width:auto;height:auto;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============ NAVBAR ============ -->
+<header class="sticky top-0 z-40 glass border-b" style="border-color:var(--clr-border)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold shadow-md" style="background:linear-gradient(135deg,var(--clr-primary),var(--clr-accent))">S</div>
+      <span class="font-extrabold text-lg tracking-tight">SuperGenerate</span>
+    </div>
+    <div class="hidden md:flex items-center gap-2 text-sm font-medium" style="color:var(--clr-muted)">
+      <a href="#generator" class="px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Generator</a>
+      <a href="#results" class="px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Hasil</a>
+      <button id="aboutBtn" class="px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">About</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="relative" id="exportMenuWrap">
+        <button id="exportMenuBtn" class="btn px-3 py-2 text-xs sm:text-sm border" style="border-color:var(--clr-border)" aria-haspopup="true">
+          <span class="hidden sm:inline">Export</span> ⬇
+        </button>
+        <div id="exportMenu" class="hidden absolute right-0 mt-2 w-44 card p-1.5 z-50 fade-in">
+          <button data-export="csv" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">📄 CSV</button>
+          <button data-export="xlsx" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">📊 Excel (.xlsx)</button>
+          <button data-export="pdf" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">📕 PDF</button>
+          <button data-export="txt" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">📝 TXT</button>
+          <button data-export="json" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">{ } JSON</button>
+          <button data-export="mikrotik" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">🛰 MikroTik Script</button>
+          <button data-export="clipboard" class="exp-item w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-black/5 dark:hover:bg-white/5">📋 Clipboard</button>
+        </div>
+      </div>
+      <label for="importFile" class="btn px-3 py-2 text-xs sm:text-sm border cursor-pointer" style="border-color:var(--clr-border)" title="Import CSV/TXT/Excel">⬆ <span class="hidden sm:inline">Import</span></label>
+      <input type="file" id="importFile" accept=".csv,.txt,.xlsx,.xls" class="hidden">
+      <a href="https://superlinknetworks.com" target="_blank" rel="noopener" class="btn px-3 py-2 text-xs sm:text-sm border hidden sm:inline-flex items-center gap-1" style="border-color:var(--clr-border)">
+      Superlinknetworks
+      </a>
+      <button id="themeToggle" class="btn p-2 border" style="border-color:var(--clr-border)" aria-label="Toggle dark mode">
+        <svg id="iconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.02 0l-.7.7M6.34 17.66l-.7.7M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+        <svg id="iconMoon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 1020.354 15.354z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-6 text-center">
+  <span class="badge inline-block mb-3" style="background:color-mix(in srgb, var(--clr-accent) 15%, transparent); color:var(--clr-accent)">⚡ Generate ribuan akun dalam hitungan detik</span>
+  <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-3">Modern <span style="color:var(--clr-primary)">PPPoE</span> Username Generator</h1>
+  <p class="max-w-2xl mx-auto text-sm sm:text-base" style="color:var(--clr-muted)">Generate ribuan username PPPoE secara otomatis dalam hitungan detik. Lengkap dengan password generator, host generator, export MikroTik, dan tabel hasil interaktif.</p>
+</section>
+
+<!-- ============ STATISTIK ============ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="card p-4 scale-pop">
+      <div class="label">Jumlah User</div>
+      <div id="statUsers" class="text-2xl font-extrabold counter" style="color:var(--clr-primary)">0</div>
+    </div>
+    <div class="card p-4 scale-pop">
+      <div class="label">Jumlah Host</div>
+      <div id="statHosts" class="text-2xl font-extrabold counter" style="color:var(--clr-info)">0</div>
+    </div>
+    <div class="card p-4 scale-pop">
+      <div class="label">Estimasi Total</div>
+      <div id="statTotal" class="text-2xl font-extrabold counter" style="color:var(--clr-success)">0</div>
+    </div>
+    <div class="card p-4 scale-pop">
+      <div class="label">Digit / Prefix</div>
+      <div id="statDigit" class="text-2xl font-extrabold counter" style="color:var(--clr-accent)">-</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GENERATOR ============ -->
+<section id="generator" class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-3 gap-5 mb-10">
+  <!-- Form -->
+  <div class="lg:col-span-2 card p-5 sm:p-6">
+    <h2 class="font-bold text-lg mb-4 flex items-center gap-2">Konfigurasi Generator</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label class="label">Prefix</label>
+        <input id="fPrefix" class="input" placeholder="HOME / BIZ / VIP" value="HOME" maxlength="20">
+      </div>
+      <div>
+        <label class="label">Suffix (opsional)</label>
+        <input id="fSuffix" class="input" placeholder="contoh: GSK" maxlength="20">
+      </div>
+      <div>
+        <label class="label">Nomor Awal</label>
+        <input id="fStart" type="number" class="input" value="1" min="0">
+      </div>
+      <div>
+        <label class="label">Nomor Akhir</label>
+        <input id="fEnd" type="number" class="input" value="20" min="0">
+      </div>
+      <div>
+        <label class="label">Jumlah Digit</label>
+        <select id="fDigit" class="input">
+          <option value="2">2 (01)</option>
+          <option value="3">3 (001)</option>
+          <option value="4" selected>4 (0001)</option>
+          <option value="5">5 (00001)</option>
+          <option value="6">6 (000001)</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Separator</label>
+        <select id="fSep" class="input">
+          <option value="">Tidak ada</option>
+          <option value="-" selected>-</option>
+          <option value="_">_</option>
+          <option value=".">.</option>
+          <option value="/">/</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Region (opsional)</label>
+        <input id="fRegion" class="input" placeholder="JKT / MDN / BDG">
+      </div>
+      <div>
+        <label class="label">Template Format</label>
+        <select id="fTemplate" class="input">
+          <option value="basic">PREFIX + SEP + NUMBER (HOME-0001)</option>
+          <option value="suffix">PREFIX + SEP + SUFFIX + NUMBER (HOME-GSK0001)</option>
+          <option value="region">PREFIX + SEP + REGION + SEP + NUMBER (HOME-JKT-0001)</option>
+          <option value="custom">Custom (gunakan {prefix} {region} {suffix} {number} {sep})</option>
+        </select>
+      </div>
+      <div class="sm:col-span-2 hidden" id="customTplWrap">
+        <label class="label">Custom Template</label>
+        <input id="fCustomTpl" class="input" placeholder="{prefix}{sep}{region}{sep}{number}">
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-4 mt-5 pt-5 border-t" style="border-color:var(--clr-border)">
+      <div>
+        <label class="label">Cabang / POP</label>
+        <input id="fPop" class="input" placeholder="POP01">
+      </div>
+      <div>
+        <label class="label">OLT</label>
+        <input id="fOlt" class="input" placeholder="OLT02">
+      </div>
+      <div>
+        <label class="label">VLAN</label>
+        <input id="fVlan" class="input" placeholder="100">
+      </div>
+      <div class="sm:col-span-3">
+        <label class="label">Keterangan / Comment</label>
+        <input id="fKet" class="input" placeholder="Pelanggan Perumahan">
+      </div>
+    </div>
+
+    <!-- Password generator -->
+    <div class="mt-5 pt-5 border-t" style="border-color:var(--clr-border)">
+      <label class="flex items-center gap-2 mb-3 cursor-pointer">
+        <input type="checkbox" id="fGenPass" class="checkbox" checked>
+        <span class="font-semibold text-sm">Generate Password</span>
+      </label>
+      <div id="passOptions" class="grid sm:grid-cols-3 gap-4">
+        <div>
+          <label class="label">Mode Password</label>
+          <select id="fPassMode" class="input">
+            <option value="random">Random</option>
+            <option value="same">Sama dengan Username</option>
+            <option value="custom">Custom Prefix</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Panjang Password</label>
+          <select id="fPassLen" class="input">
+            <option value="8">8</option>
+            <option value="10" selected>10</option>
+            <option value="12">12</option>
+            <option value="16">16</option>
+          </select>
+        </div>
+        <div id="customPassWrap" class="hidden">
+          <label class="label">Custom Prefix</label>
+          <input id="fPassPrefix" class="input" placeholder="pass">
+        </div>
+        <div class="sm:col-span-3 flex flex-wrap gap-4 mt-1">
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="fPassLetter" class="checkbox" checked> Huruf</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="fPassNumber" class="checkbox" checked> Angka</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="fPassSymbol" class="checkbox"> Simbol</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Host generator -->
+    <div class="mt-5 pt-5 border-t" style="border-color:var(--clr-border)">
+      <label class="flex items-center gap-2 mb-3 cursor-pointer">
+        <input type="checkbox" id="fGenHost" class="checkbox">
+        <span class="font-semibold text-sm">Auto Host Generator</span>
+      </label>
+      <div id="hostOptions" class="grid sm:grid-cols-2 gap-4 opacity-50 pointer-events-none">
+        <div>
+          <label class="label">Jumlah Host</label>
+          <select id="fHostCount" class="input">
+            <option>1</option><option>10</option><option selected>50</option><option>100</option><option>250</option><option>500</option><option>1000</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Host Prefix</label>
+          <input id="fHostPrefix" class="input" placeholder="host / pppoe / client / cust" value="host">
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <button id="generateBtn" class="btn btn-primary px-6 py-3 flex items-center gap-2 relative overflow-hidden">
+        <span id="genBtnIcon">⚡</span> Generate Username <kbd class="text-xs opacity-70 hidden sm:inline">Ctrl+G</kbd>
+      </button>
+      <button id="clearBtn" class="btn px-5 py-3 border" style="border-color:var(--clr-border)">🗑️ Clear All</button>
+    </div>
+    <p id="formError" class="text-sm mt-3 hidden" style="color:#ef4444"></p>
+  </div>
+
+  <!-- Live Preview -->
+  <div class="card p-5 sm:p-6">
+    <h2 class="font-bold text-lg mb-4 flex items-center gap-2">Live Preview</h2>
+    <div id="previewBox" class="space-y-2 text-sm font-mono">
+      <div class="skel h-5 w-3/4"></div>
+      <div class="skel h-5 w-2/3"></div>
+      <div class="skel h-5 w-5/6"></div>
+    </div>
+    <div class="mt-4 pt-4 border-t text-xs" style="border-color:var(--clr-border); color:var(--clr-muted)">
+      Preview menampilkan 3 baris pertama secara realtime saat anda mengubah konfigurasi.
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLE RESULT ============ -->
+<section id="results" class="max-w-7xl mx-auto px-4 sm:px-6 mb-16">
+  <div class="card p-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="font-bold text-lg flex items-center gap-2">Hasil Generate</h2>
+      <div class="flex flex-wrap items-center gap-2">
+        <input id="searchInput" class="input w-44 sm:w-56" placeholder="🔍 Cari username/host...">
+        <select id="filterStatus" class="input w-32">
+          <option value="">Semua Status</option>
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
+        </select>
+        <select id="pageSize" class="input w-24">
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 mb-3 text-sm">
+      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="selectAll" class="checkbox"> Pilih Semua</label>
+      <button id="deleteSelected" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border); color:#ef4444">🗑 Hapus Terpilih</button>
+      <button id="copySelected" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Terpilih</button>
+      <button id="copyUserCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Kolom Username</button>
+      <button id="copyPassCol" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Kolom Password</button>
+      <button id="copyAll" class="btn px-3 py-1.5 text-xs border" style="border-color:var(--clr-border)">Copy Semua</button>
+      <span id="selCount" class="text-xs ml-auto" style="color:var(--clr-muted)"></span>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border" style="border-color:var(--clr-border); max-height:520px;">
+      <table class="modern w-full text-sm" id="resultTable">
+        <thead>
+          <tr style="background:var(--clr-surface)">
+            <th class="p-3 text-left w-8"><input type="checkbox" id="selectAllHead" class="checkbox"></th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="no">No</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="username">Username ↕</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="password">Password ↕</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="host">Host ↕</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="profile">Profile ↕</th>
+            <th class="p-3 text-left">Comment</th>
+            <th class="p-3 text-left cursor-pointer sort-col" data-key="status">Status ↕</th>
+            <th class="p-3 text-left">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)">
+            <div class="text-4xl mb-2"></div>
+            Belum ada data. Klik <b>Generate Username</b> untuk mulai.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-4 text-sm">
+      <span id="paginationInfo" style="color:var(--clr-muted)"></span>
+      <div class="flex items-center gap-1" id="paginationControls"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer style="background:var(--clr-footer)" class="text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid sm:grid-cols-3 gap-6 text-sm">
+    <div>
+      <div class="font-extrabold text-lg mb-2">SuperGenerate</div>
+      <p class="opacity-60">Modern PPPoE Username Generator untuk ISP & Network Engineer. 100% berjalan di browser, tanpa server, tanpa data dikirim kemanapun.</p>
+    </div>
+    <div>
+      <div class="font-semibold mb-2">Shortcut</div>
+      <ul class="opacity-60 space-y-1">
+        <li>Ctrl + G — Generate</li>
+        <li>Ctrl + E — Export Menu</li>
+        <li>Ctrl + C — Copy Semua</li>
+        <li>Ctrl + D — Toggle Dark Mode</li>
+      </ul>
+    </div>
+    <div>
+      <div class="font-semibold mb-2">About</div>
+      <p class="opacity-60">Dibuat dengan HTML5, Tailwind CSS, dan Vanilla JavaScript ES6+. Tanpa framework, tanpa jQuery. Open source &amp; gratis.</p>
+    </div>
+  </div>
+  <div class="text-center opacity-40 text-xs pb-6">© 2026 SuperGenerate. All rights reserved.</div>
+</footer>
+
+<!-- Toast container -->
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+<!-- About modal -->
+<div id="aboutModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+  <div class="card p-6 max-w-md w-full fade-in">
+    <h3 class="font-bold text-lg mb-2">Tentang SuperGenerate</h3>
+    <p class="text-sm mb-4" style="color:var(--clr-muted)">SuperGenerate adalah tool generator username PPPoE modern untuk kebutuhan ISP dan Network Engineer. Dibangun 100% client-side — data anda tidak pernah meninggalkan browser.</p>
+    <button id="closeAbout" class="btn btn-primary w-full py-2.5">Tutup</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =========================================================
+   UTILS
+========================================================= */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function escapeHTML(str){
+  return String(str).replace(/[&<>"']/g, (m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function sanitizeInput(str){
+  return String(str || '').replace(/[<>"'`;]/g,'').trim();
+}
+function pad(num, digits){
+  return String(num).padStart(digits,'0');
+}
+function showToast(msg, type='info'){
+  const colors = {info:'var(--clr-info)', success:'var(--clr-success)', warning:'var(--clr-warning)', error:'#ef4444'};
+  const el = document.createElement('div');
+  el.className = 'toast card px-4 py-3 text-sm flex items-center gap-2 shadow-lg';
+  el.style.borderLeft = `4px solid ${colors[type]||colors.info}`;
+  el.innerHTML = `<span>${escapeHTML(msg)}</span>`;
+  $('#toastContainer').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(120%)'; setTimeout(()=>el.remove(),300); }, 2800);
+}
+function ripple(e, btn){
+  const circle = document.createElement('span');
+  const d = Math.max(btn.clientWidth, btn.clientHeight);
+  circle.className = 'ripple';
+  circle.style.width = circle.style.height = d+'px';
+  const rect = btn.getBoundingClientRect();
+  circle.style.left = (e.clientX - rect.left - d/2)+'px';
+  circle.style.top = (e.clientY - rect.top - d/2)+'px';
+  btn.appendChild(circle);
+  setTimeout(()=>circle.remove(),600);
+}
+$$('.btn').forEach(b=> b.addEventListener('click', (e)=> ripple(e,b)));
+
+function animateCounter(el, to){
+  const from = parseInt(el.textContent.replace(/\D/g,'')) || 0;
+  const dur = 500; const start = performance.now();
+  function step(now){
+    const p = Math.min(1,(now-start)/dur);
+    el.textContent = Math.round(from + (to-from)*p).toLocaleString('id-ID');
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* =========================================================
+   THEME MODULE
+========================================================= */
+const Theme = (()=>{
+  function apply(mode){
+    document.documentElement.classList.toggle('dark', mode==='dark');
+    $('#iconSun').classList.toggle('hidden', mode!=='dark');
+    $('#iconMoon').classList.toggle('hidden', mode==='dark');
+    localStorage.setItem('sg_theme', mode);
+  }
+  function init(){
+    const saved = localStorage.getItem('sg_theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(saved || (systemDark?'dark':'light'));
+    $('#themeToggle').addEventListener('click', ()=>{
+      const isDark = document.documentElement.classList.contains('dark');
+      apply(isDark?'light':'dark');
+    });
+  }
+  return {init};
+})();
+
+/* =========================================================
+   GENERATOR MODULE
+========================================================= */
+const Generator = (()=>{
+  const SYMS = '!@#$%^&*';
+  const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
+  const NUMS = '0123456789';
+
+  function buildUsername(opts, n){
+    const numStr = pad(n, opts.digit);
+    const sep = opts.sep;
+    let base;
+    switch(opts.template){
+      case 'suffix':
+        base = `${opts.prefix}${sep}${opts.suffix}${numStr}`; break;
+      case 'region':
+        base = `${opts.prefix}${sep}${opts.region}${sep}${numStr}`; break;
+      case 'custom':
+        base = opts.customTpl
+          .replace(/{prefix}/g, opts.prefix)
+          .replace(/{region}/g, opts.region)
+          .replace(/{suffix}/g, opts.suffix)
+          .replace(/{sep}/g, sep)
+          .replace(/{number}/g, numStr);
+        break;
+      default:
+        base = `${opts.prefix}${sep}${numStr}`;
+    }
+    return base.replace(/[^A-Za-z0-9._\-\/]/g,'');
+  }
+
+  function randomChars(pool, len){
+    let out='';
+    for(let i=0;i<len;i++) out += pool[Math.floor(Math.random()*pool.length)];
+    return out;
+  }
+
+  function buildPassword(opts, username){
+    if(!opts.genPass) return '';
+    if(opts.passMode === 'same') return username;
+    let pool = '';
+    if(opts.passLetter) pool += LETTERS + LETTERS.toUpperCase();
+    if(opts.passNumber) pool += NUMS;
+    if(opts.passSymbol) pool += SYMS;
+    if(!pool) pool = NUMS;
+    if(opts.passMode === 'custom'){
+      const rest = Math.max(0, opts.passLen - opts.passPrefix.length);
+      return opts.passPrefix + randomChars(pool, rest);
+    }
+    return randomChars(pool, opts.passLen);
+  }
+
+  function generate(opts){
+    const list = [];
+    const start = opts.start, end = opts.end;
+    const total = Math.abs(end-start)+1;
+    for(let i=0;i<total;i++){
+      const n = start <= end ? start+i : start-i;
+      const username = buildUsername(opts, n);
+      const password = buildPassword(opts, username);
+      const host = opts.genHost && opts.hostList[i] ? opts.hostList[i] : '';
+      list.push({
+        no: i+1,
+        username,
+        password,
+        host,
+        profile: 'default',
+        comment: opts.keterangan || '',
+        status: 'active',
+        region: opts.region, pop: opts.pop, olt: opts.olt, vlan: opts.vlan,
+        selected: false
+      });
+    }
+    return list;
+  }
+
+  function generateHosts(prefix, count){
+    const digits = String(count).length < 3 ? 3 : String(count).length;
+    const arr = [];
+    for(let i=1;i<=count;i++) arr.push(`${prefix}${pad(i,digits)}`);
+    return arr;
+  }
+
+  return {generate, generateHosts, buildUsername, buildPassword};
+})();
+
+/* =========================================================
+   APP STATE
+========================================================= */
+const State = {
+  data: [],
+  filtered: [],
+  page: 1,
+  pageSize: 25,
+  sortKey: null,
+  sortDir: 1,
+  search: '',
+  statusFilter: ''
+};
+
+function getFormOptions(){
+  return {
+    prefix: sanitizeInput($('#fPrefix').value) || 'USER',
+    suffix: sanitizeInput($('#fSuffix').value),
+    start: parseInt($('#fStart').value)||0,
+    end: parseInt($('#fEnd').value)||0,
+    digit: parseInt($('#fDigit').value),
+    sep: $('#fSep').value,
+    region: sanitizeInput($('#fRegion').value),
+    template: $('#fTemplate').value,
+    customTpl: $('#fCustomTpl').value,
+    pop: sanitizeInput($('#fPop').value),
+    olt: sanitizeInput($('#fOlt').value),
+    vlan: sanitizeInput($('#fVlan').value),
+    keterangan: sanitizeInput($('#fKet').value),
+    genPass: $('#fGenPass').checked,
+    passMode: $('#fPassMode').value,
+    passLen: parseInt($('#fPassLen').value),
+    passPrefix: sanitizeInput($('#fPassPrefix').value),
+    passLetter: $('#fPassLetter').checked,
+    passNumber: $('#fPassNumber').checked,
+    passSymbol: $('#fPassSymbol').checked,
+    genHost: $('#fGenHost').checked,
+    hostCount: parseInt($('#fHostCount').value)||0,
+    hostPrefix: sanitizeInput($('#fHostPrefix').value)||'host',
+    hostList: []
+  };
+}
+
+function validateOptions(opts){
+  if(!opts.prefix) return 'Prefix tidak boleh kosong.';
+  const total = Math.abs(opts.end - opts.start)+1;
+  if(total > 10000) return 'Jumlah maksimal generate adalah 10.000 user.';
+  if(opts.digit < 1 || opts.digit > 8) return 'Jumlah digit tidak valid.';
+  if(/[^A-Za-z0-9._\-\/ ]/.test(opts.prefix)) return 'Prefix mengandung karakter ilegal.';
+  return null;
+}
+
+function liveUpdateStats(){
+  const opts = getFormOptions();
+  const total = Math.max(0, Math.abs(opts.end - opts.start)+1);
+  $('#statDigit').textContent = `${opts.digit} / ${opts.prefix || '-'}`;
+  // preview
+  const previewBox = $('#previewBox');
+  if(!opts.prefix){ return; }
+  const sample = [];
+  for(let i=0;i<Math.min(3,total);i++){
+    const n = opts.start + i;
+    const u = Generator.buildUsername(opts, n);
+    const p = Generator.buildPassword(opts, u);
+    sample.push(`<div class="fade-in flex justify-between gap-2 p-2 rounded-lg" style="background:var(--clr-bg);border:1px solid var(--clr-border)"><span class="font-semibold">${escapeHTML(u)}</span><span style="color:var(--clr-muted)">${escapeHTML(p)}</span></div>`);
+  }
+  previewBox.innerHTML = sample.join('') || '<span style="color:var(--clr-muted)">Tidak ada preview</span>';
+}
+
+/* =========================================================
+   TABLE RENDER MODULE
+========================================================= */
+function applyFilters(){
+  const s = State.search.toLowerCase();
+  State.filtered = State.data.filter(row=>{
+    const matchSearch = !s || row.username.toLowerCase().includes(s) || row.host.toLowerCase().includes(s);
+    const matchStatus = !State.statusFilter || row.status === State.statusFilter;
+    return matchSearch && matchStatus;
+  });
+  if(State.sortKey){
+    State.filtered.sort((a,b)=>{
+      const av=a[State.sortKey], bv=b[State.sortKey];
+      if(typeof av === 'number') return (av-bv)*State.sortDir;
+      return String(av).localeCompare(String(bv)) * State.sortDir;
+    });
+  }
+  State.page = Math.min(State.page, Math.max(1, Math.ceil(State.filtered.length/State.pageSize)));
+}
+
+function renderTable(){
+  applyFilters();
+  const tbody = $('#tableBody');
+  const startIdx = (State.page-1)*State.pageSize;
+  const pageRows = State.filtered.slice(startIdx, startIdx+State.pageSize);
+
+  if(State.data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)"><div class="text-4xl mb-2">📭</div>Belum ada data. Klik <b>Generate Username</b> untuk mulai.</td></tr>`;
+  } else if(pageRows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="9" class="p-10 text-center" style="color:var(--clr-muted)">🔍 Tidak ada data yang cocok dengan pencarian.</td></tr>`;
+  } else {
+    tbody.innerHTML = pageRows.map(row=>{
+      const statusColor = row.status==='active' ? 'var(--clr-success)' : '#ef4444';
+      return `<tr class="border-t fade-in" style="border-color:var(--clr-border)" data-id="${row.no}">
+        <td class="p-3"><input type="checkbox" class="checkbox row-check" data-id="${row.no}" ${row.selected?'checked':''}></td>
+        <td class="p-3">${row.no}</td>
+        <td class="p-3 font-mono font-semibold">${escapeHTML(row.username)}</td>
+        <td class="p-3 font-mono">${escapeHTML(row.password)}</td>
+        <td class="p-3 font-mono">${escapeHTML(row.host)}</td>
+        <td class="p-3">${escapeHTML(row.profile)}</td>
+        <td class="p-3">${escapeHTML(row.comment)}</td>
+        <td class="p-3"><span class="badge" style="background:color-mix(in srgb, ${statusColor} 15%, transparent); color:${statusColor}">${row.status}</span></td>
+        <td class="p-3 flex gap-1">
+          <button class="copy-row tooltip" data-tip="Copy" data-id="${row.no}">📋</button>
+          <button class="edit-row tooltip" data-tip="Edit" data-id="${row.no}">✏️</button>
+          <button class="delete-row tooltip" data-tip="Hapus" data-id="${row.no}">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  const totalPages = Math.max(1, Math.ceil(State.filtered.length/State.pageSize));
+  $('#paginationInfo').textContent = `Menampilkan ${pageRows.length} dari ${State.filtered.length} data (Halaman ${State.page}/${totalPages})`;
+  renderPagination(totalPages);
+  updateSelCount();
+
+  $('#statUsers').textContent = State.data.length.toLocaleString('id-ID');
+  $('#statHosts').textContent = State.data.filter(r=>r.host).length.toLocaleString('id-ID');
+}
+
+function renderPagination(totalPages){
+  const cont = $('#paginationControls');
+  let html = '';
+  const mkBtn = (label, page, disabled=false, active=false) =>
+    `<button class="page-btn px-3 py-1.5 rounded-lg text-xs border ${active?'btn-primary':''}" style="border-color:var(--clr-border)" data-page="${page}" ${disabled?'disabled':''}>${label}</button>`;
+  html += mkBtn('«', State.page-1, State.page<=1);
+  const range = 2;
+  for(let p=1;p<=totalPages;p++){
+    if(p===1||p===totalPages||Math.abs(p-State.page)<=range){
+      html += mkBtn(p, p, false, p===State.page);
+    } else if(Math.abs(p-State.page)===range+1){
+      html += `<span class="px-1" style="color:var(--clr-muted)">...</span>`;
+    }
+  }
+  html += mkBtn('»', State.page+1, State.page>=totalPages);
+  cont.innerHTML = html;
+  $$('.page-btn').forEach(btn=>btn.addEventListener('click', ()=>{
+    const p = parseInt(btn.dataset.page);
+    if(p>=1 && p<=totalPages){ State.page = p; renderTable(); }
+  }));
+}
+
+function updateSelCount(){
+  const count = State.data.filter(r=>r.selected).length;
+  $('#selCount').textContent = count>0 ? `${count} dipilih` : '';
+}
+
+/* =========================================================
+   EXPORT MODULE
+========================================================= */
+const ExportModule = (()=>{
+  function rowsToCSVText(rows){
+    const headers = ['No','Username','Password','Host','Profile','Comment','Status'];
+    const lines = [headers.join(',')];
+    rows.forEach(r=> lines.push([r.no,r.username,r.password,r.host,r.profile,`"${r.comment.replace(/"/g,'""')}"`,r.status].join(',')));
+    return lines.join('\n');
+  }
+  function download(filename, content, mime='text/plain'){
+    const blob = new Blob([content], {type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+  function toCSV(rows){ download('username.csv', rowsToCSVText(rows), 'text/csv'); }
+  function toTXT(rows){
+    const text = rows.map(r=>`${r.username}:${r.password}`).join('\n');
+    download('username.txt', text, 'text/plain');
+  }
+  function toJSON(rows){ download('username.json', JSON.stringify(rows,null,2), 'application/json'); }
+  function toXLSX(rows){
+    const ws = XLSX.utils.json_to_sheet(rows.map(r=>({No:r.no,Username:r.username,Password:r.password,Host:r.host,Profile:r.profile,Comment:r.comment,Status:r.status})));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Username');
+    XLSX.writeFile(wb,'username.xlsx');
+  }
+  function toPDF(rows){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(14); doc.text('SuperGenerate - Username Export', 14, 15);
+    doc.autoTable({
+      startY: 22,
+      head: [['No','Username','Password','Host','Profile','Status']],
+      body: rows.map(r=>[r.no,r.username,r.password,r.host,r.profile,r.status]),
+      styles:{fontSize:8}
+    });
+    doc.save('username.pdf');
+  }
+  function toMikrotik(rows){
+    const lines = rows.map(r=>{
+      return `/ppp secret add \\\n  name=${r.username} \\\n  password=${r.password} \\\n  service=pppoe \\\n  profile=${r.profile} \\\n  comment="${r.comment||''}"${r.status==='disabled'?' \\\n  disabled=yes':''}`;
+    });
+    download('mikrotik_secrets.rsc', lines.join('\n\n'), 'text/plain');
+  }
+  function toClipboard(rows){
+    const text = rows.map(r=>`${r.username}:${r.password}`).join('\n');
+    navigator.clipboard.writeText(text).then(()=>showToast('Disalin ke clipboard!','success'));
+  }
+  return {toCSV, toTXT, toJSON, toXLSX, toPDF, toMikrotik, toClipboard};
+})();
+
+/* =========================================================
+   IMPORT MODULE
+========================================================= */
+function importFile(file){
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    let rows = [];
+    try{
+      if(ext === 'xlsx' || ext === 'xls'){
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        rows = json.map((r,i)=>({no:i+1, username:sanitizeInput(r.Username||r.username||''), password:sanitizeInput(r.Password||r.password||''), host:sanitizeInput(r.Host||r.host||''), profile:r.Profile||'default', comment:r.Comment||'', status:r.Status||'active', selected:false}));
+      } else if(ext === 'csv'){
+        const lines = e.target.result.split(/\r?\n/).filter(Boolean);
+        rows = lines.slice(1).map((line,i)=>{
+          const [no,username,password,host,profile,comment,status] = line.split(',');
+          return {no:i+1, username:sanitizeInput(username), password:sanitizeInput(password), host:sanitizeInput(host||''), profile:profile||'default', comment:(comment||'').replace(/"/g,''), status:status||'active', selected:false};
+        });
+      } else if(ext === 'txt'){
+        const lines = e.target.result.split(/\r?\n/).filter(Boolean);
+        rows = lines.map((line,i)=>{
+          const [username,password] = line.split(':');
+          return {no:i+1, username:sanitizeInput(username), password:sanitizeInput(password||''), host:'', profile:'default', comment:'', status:'active', selected:false};
+        });
+      }
+      State.data = rows;
+      State.page = 1;
+      renderTable();
+      showToast(`Import berhasil: ${rows.length} baris`, 'success');
+    }catch(err){
+      showToast('Gagal mengimpor file: format tidak valid', 'error');
+    }
+  };
+  if(ext === 'xlsx' || ext === 'xls') reader.readAsBinaryString(file);
+  else reader.readAsText(file);
+}
+
+/* =========================================================
+   EVENT BINDINGS
+========================================================= */
+function bindFormLiveUpdate(){
+  ['fPrefix','fSuffix','fStart','fEnd','fDigit','fSep','fRegion','fTemplate','fCustomTpl','fPop','fOlt','fVlan','fKet',
+   'fGenPass','fPassMode','fPassLen','fPassPrefix','fPassLetter','fPassNumber','fPassSymbol','fGenHost','fHostCount','fHostPrefix']
+   .forEach(id=>{
+      const el = $('#'+id);
+      el.addEventListener('input', liveUpdateStats);
+      el.addEventListener('change', liveUpdateStats);
+   });
+
+  $('#fTemplate').addEventListener('change', ()=>{
+    $('#customTplWrap').classList.toggle('hidden', $('#fTemplate').value !== 'custom');
+  });
+  $('#fPassMode').addEventListener('change', ()=>{
+    $('#customPassWrap').classList.toggle('hidden', $('#fPassMode').value !== 'custom');
+  });
+  $('#fGenPass').addEventListener('change', ()=>{
+    $('#passOptions').classList.toggle('opacity-50', !$('#fGenPass').checked);
+    $('#passOptions').classList.toggle('pointer-events-none', !$('#fGenPass').checked);
+  });
+  $('#fGenHost').addEventListener('change', ()=>{
+    $('#hostOptions').classList.toggle('opacity-50', !$('#fGenHost').checked);
+    $('#hostOptions').classList.toggle('pointer-events-none', !$('#fGenHost').checked);
+  });
+}
+
+function handleGenerate(){
+  const opts = getFormOptions();
+  const err = validateOptions(opts);
+  if(err){
+    $('#formError').textContent = err;
+    $('#formError').classList.remove('hidden');
+    showToast(err, 'error');
+    return;
+  }
+  $('#formError').classList.add('hidden');
+
+  const btn = $('#generateBtn');
+  const icon = $('#genBtnIcon');
+  icon.outerHTML = '<span id="genBtnIcon" class="spinner inline-block"></span>';
+  btn.disabled = true;
+
+  setTimeout(()=>{
+    if(opts.genHost){
+      opts.hostList = Generator.generateHosts(opts.hostPrefix, opts.hostCount);
+    }
+    const result = Generator.generate(opts);
+    // duplicate check
+    const seen = new Set();
+    let dupCount = 0;
+    result.forEach(r=>{
+      if(seen.has(r.username)) dupCount++;
+      seen.add(r.username);
+    });
+    State.data = result;
+    State.page = 1;
+    renderTable();
+    animateCounter($('#statTotal'), result.length);
+    showToast(`Berhasil generate ${result.length} username!${dupCount? ' ('+dupCount+' duplikat ditemukan)':''}`, dupCount? 'warning':'success');
+    $('#generateBtn').innerHTML = '<span id="genBtnIcon">⚡</span> Generate Username <kbd class="text-xs opacity-70 hidden sm:inline">Ctrl+G</kbd>';
+    $('#generateBtn').disabled = false;
+    document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 350);
+}
+
+function bindEvents(){
+  $('#generateBtn').addEventListener('click', handleGenerate);
+  $('#clearBtn').addEventListener('click', ()=>{
+    State.data = []; State.filtered = []; State.page=1;
+    renderTable();
+    $('#statTotal').textContent = '0';
+    showToast('Semua data dihapus','info');
+  });
+
+  // export menu
+  $('#exportMenuBtn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    $('#exportMenu').classList.toggle('hidden');
+  });
+  document.addEventListener('click', (e)=>{
+    if(!$('#exportMenuWrap').contains(e.target)) $('#exportMenu').classList.add('hidden');
+  });
+  $$('.exp-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(State.data.length===0){ showToast('Tidak ada data untuk diexport','warning'); $('#exportMenu').classList.add('hidden'); return; }
+      const type = btn.dataset.export;
+      const rows = State.data;
+      ({csv:ExportModule.toCSV, xlsx:ExportModule.toXLSX, pdf:ExportModule.toPDF, txt:ExportModule.toTXT,
+        json:ExportModule.toJSON, mikrotik:ExportModule.toMikrotik, clipboard:ExportModule.toClipboard}[type])(rows);
+      showToast(`Export ${type.toUpperCase()} berhasil`, 'success');
+      $('#exportMenu').classList.add('hidden');
+    });
+  });
+
+  // import
+  $('#importFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(file) importFile(file);
+    e.target.value = '';
+  });
+
+  // search & filter
+  $('#searchInput').addEventListener('input', (e)=>{ State.search = e.target.value; State.page=1; renderTable(); });
+  $('#filterStatus').addEventListener('change', (e)=>{ State.statusFilter = e.target.value; State.page=1; renderTable(); });
+  $('#pageSize').addEventListener('change', (e)=>{ State.pageSize = parseInt(e.target.value); State.page=1; renderTable(); });
+
+  // sort
+  $$('.sort-col').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.key;
+      if(State.sortKey === key) State.sortDir *= -1; else { State.sortKey = key; State.sortDir = 1; }
+      renderTable();
+    });
+  });
+
+  // table delegation
+  $('#tableBody').addEventListener('click', (e)=>{
+    const id = e.target.dataset.id;
+    if(!id) return;
+    const row = State.data.find(r=> String(r.no)===String(id));
+    if(!row) return;
+    if(e.target.classList.contains('copy-row')){
+      navigator.clipboard.writeText(`${row.username}:${row.password}`);
+      e.target.closest('tr').classList.add('copy-flash');
+      showToast('Baris disalin','success');
+    } else if(e.target.classList.contains('delete-row')){
+      State.data = State.data.filter(r=> r!==row);
+      renderTable();
+      showToast('Baris dihapus','info');
+    } else if(e.target.classList.contains('edit-row')){
+      const newUser = prompt('Edit Username:', row.username);
+      if(newUser!==null) row.username = sanitizeInput(newUser);
+      const newPass = prompt('Edit Password:', row.password);
+      if(newPass!==null) row.password = sanitizeInput(newPass);
+      renderTable();
+    }
+  });
+  $('#tableBody').addEventListener('change', (e)=>{
+    if(e.target.classList.contains('row-check')){
+      const row = State.data.find(r=> String(r.no)===String(e.target.dataset.id));
+      if(row) row.selected = e.target.checked;
+      updateSelCount();
+    }
+  });
+
+  $('#selectAll').addEventListener('change', (e)=>{
+    State.filtered.forEach(r=> r.selected = e.target.checked);
+    renderTable();
+  });
+  $('#selectAllHead').addEventListener('change', (e)=>{
+    State.filtered.forEach(r=> r.selected = e.target.checked);
+    renderTable();
+  });
+  $('#deleteSelected').addEventListener('click', ()=>{
+    const n = State.data.filter(r=>r.selected).length;
+    if(n===0){ showToast('Tidak ada baris terpilih','warning'); return; }
+    State.data = State.data.filter(r=> !r.selected);
+    renderTable();
+    showToast(`${n} baris dihapus`,'info');
+  });
+  $('#copySelected').addEventListener('click', ()=>{
+    const sel = State.data.filter(r=>r.selected);
+    if(sel.length===0){ showToast('Tidak ada baris terpilih','warning'); return; }
+    navigator.clipboard.writeText(sel.map(r=>`${r.username}:${r.password}`).join('\n'));
+    showToast(`${sel.length} baris disalin`,'success');
+  });
+  $('#copyUserCol').addEventListener('click', ()=>{
+    if(State.data.length===0) return showToast('Tidak ada data','warning');
+    navigator.clipboard.writeText(State.data.map(r=>r.username).join('\n'));
+    showToast('Kolom username disalin','success');
+  });
+  $('#copyPassCol').addEventListener('click', ()=>{
+    if(State.data.length===0) return showToast('Tidak ada data','warning');
+    navigator.clipboard.writeText(State.data.map(r=>r.password).join('\n'));
+    showToast('Kolom password disalin','success');
+  });
+  $('#copyAll').addEventListener('click', ()=>{
+    if(State.data.length===0) return showToast('Tidak ada data','warning');
+    navigator.clipboard.writeText(State.data.map(r=>`${r.username}:${r.password}`).join('\n'));
+    showToast('Semua data disalin','success');
+  });
+
+  // about modal
+  $('#aboutBtn').addEventListener('click', ()=> $('#aboutModal').classList.remove('hidden'));
+  $('#closeAbout').addEventListener('click', ()=> $('#aboutModal').classList.add('hidden'));
+  $('#aboutModal').addEventListener('click', (e)=>{ if(e.target.id==='aboutModal') $('#aboutModal').classList.add('hidden'); });
+
+  // keyboard shortcuts
+  document.addEventListener('keydown', (e)=>{
+    if(e.ctrlKey && e.key.toLowerCase()==='g'){ e.preventDefault(); handleGenerate(); }
+    if(e.ctrlKey && e.key.toLowerCase()==='e'){ e.preventDefault(); $('#exportMenu').classList.toggle('hidden'); }
+    if(e.ctrlKey && e.key.toLowerCase()==='c' && State.data.length>0 && !window.getSelection().toString()){ /* let native copy work normally elsewhere */ }
+    if(e.ctrlKey && e.key.toLowerCase()==='d'){ e.preventDefault(); $('#themeToggle').click(); }
+  });
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  Theme.init();
+  bindFormLiveUpdate();
+  bindEvents();
+  liveUpdateStats();
+  renderTable();
+});
+</script>
+</body>
+</html>
